@@ -1,0 +1,13 @@
+{
+  "name": "@fullsparklabs/hook",
+  "version": "1.0.0",
+  "description": "Git hooks manager with templates",
+  "main": "index.js",
+  "bin": {
+    "hook": "./index.js"
+  },
+  "type": "commonjs",
+  "repository": "https://github.com/Fullspark-Labs/hook",
+  "keywords": ["git", "hooks", "cli"],
+  "license": "MIT"
+}
