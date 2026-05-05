@@ -1,13 +1,16 @@
 {
   "name": "@fullsparklabs/hook",
-  "version": "1.0.0",
-  "description": "Git hooks manager with templates",
+  "version": "1.1.0",
+  "description": "Git hooks manager with templates - block secrets, enforce conventions, run checks",
   "main": "index.js",
   "bin": {
     "hook": "./index.js"
   },
   "type": "commonjs",
   "repository": "https://github.com/Fullspark-Labs/hook",
-  "keywords": ["git", "hooks", "cli"],
-  "license": "MIT"
+  "keywords": ["git", "hooks", "cli", "pre-commit", "git-hooks"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  }
 }

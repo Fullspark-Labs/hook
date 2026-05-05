@@ -1,24 +1,6 @@
-# hook
+# @fullsparklabs/hook
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/@fullsparklabs/hook">
-    <img src="https://img.shields.io/npm/v/@fullsparklabs/hook.svg" alt="npm version">
-  </a>
-  <a href="https://www.npmjs.com/package/@fullsparklabs/hook">
-    <img src="https://img.shields.io/npm/dm/@fullsparklabs/hook.svg" alt="npm downloads">
-  </a>
-  <a href="https://github.com/Fullspark-Labs/hook/blob/main/LICENSE">
-    <img src="https://img.shields.io/npm/l/@fullsparklabs/hook.svg" alt="license">
-  </a>
-</p>
-
-Git hooks manager with templates. Prevent secrets, enforce rules, run checks.
-
-## Why hook?
-
-- **Secure** - Block API keys, tokens, secrets from being committed
-- **Enforced** - Set branch naming, commit message rules
-- **Shareable** - Export hooks as Gists for team use
+Git hooks manager with templates. Block secrets, enforce conventions, run checks before commit.
 
 ## Installation
 
@@ -26,11 +8,37 @@ Git hooks manager with templates. Prevent secrets, enforce rules, run checks.
 npm install -g @fullsparklabs/hook
 ```
 
-Or use directly:
+## Quick Start
 
 ```bash
-npx @fullsparklabs/hook list
+# List available templates
+hook list
+
+# Block API keys and secrets
+hook install no-api-keys
+
+# Block .env files
+hook install no-env
+
+# Require JIRA tickets
+hook install check-jira commit-msg
 ```
+
+## Built-in Templates
+
+| Template | Hook Type | Description |
+|----------|----------|-------------|
+| `no-api-keys` | pre-commit | Block API keys, tokens, secrets |
+| `no-env` | pre-commit | Block .env files |
+| `no-secrets` | pre-commit | Block .pem, .key files |
+| `check-jira` | commit-msg | Require PROJ-123 format |
+| `check-branch` | pre-commit | Enforce feat/, fix/, etc. |
+| `no-package-lock` | pre-commit | Prefer pnpm/yarn |
+| `no-large-files` | pre-commit | Block >100KB files |
+| `no-node-modules` | pre-commit | Block node_modules |
+| `no-debugger` | pre-commit | Block debugger statements |
+| `require-emoji` | commit-msg | Require emoji in commit |
+| `check-merge-commit` | commit-msg | Block merge commits |
 
 ## Usage
 
@@ -38,91 +46,123 @@ npx @fullsparklabs/hook list
 
 ```bash
 hook list
-
-# Output:
-# 📋 Available Templates:
-# no-api-keys
-# no-env
-# check-branch
-# check-jira
-# run-tests
-# lint
-# prettier
 ```
 
-### Prevent Secrets in Code
+### Install Template
 
 ```bash
+hook install <template-name> [hook-type]
+
+# Examples:
+hook install no-api-keys           # installs to pre-commit
 hook install no-api-keys pre-commit
-
-# Now commits containing "apiKey", "token", "secret" will be blocked
+hook install check-jira commit-msg
+hook install no-env pre-push
 ```
 
-### Block .env Files
+### Create Custom Template
 
 ```bash
-hook install no-env pre-commit
+hook create <name> [code]
 
-# Blocks any .env files from being committed
+# Example:
+hook create mycheck '#!/bin/bash
+echo "Running my check..."
+exit 0'
+```
+
+### List Installed Hooks
+
+```bash
+hook hooks
+```
+
+### Remove Hook
+
+```bash
+hook remove pre-commit
+```
+
+### Validate Template
+
+```bash
+hook validate no-api-keys
+```
+
+## Hook Types
+
+- `pre-commit` - Runs before commit (check code, files)
+- `pre-push` - Runs before push
+- `commit-msg` - Runs after commit message
+- `pre-rebase` - Runs before rebase
+- `post-checkout` - Runs after checkout
+- `post-merge` - Runs after merge
+
+## How It Works
+
+Hooks are installed to `.git/hooks/`:
+
+```bash
+.git/hooks/
+├── pre-commit
+├── commit-msg
+└── pre-push
+```
+
+**Note**: These are local to your repository, not committed to git.
+
+## Sharing Hooks with Team
+
+Option 1: Store in repository
+
+```bash
+# Create a hooks directory
+mkdir -p .githooks
+cp .git/hooks/* .githooks/
+
+# Use custom hooks directory
+git config core.hooksPath .githooks
+```
+
+Option 2: Use a tool like [lefthook](https://github.com/arkark/lefthook) or [husky](https://github.com typicode/husky)
+
+## Examples
+
+### Block Secrets
+
+```bash
+hook install no-api-keys
+# On commit:
+# ❌ Commit blocked: src/config.js contains potential secret
+# 💡 To allow this file, move secrets to environment variables
 ```
 
 ### Require JIRA Tickets
 
 ```bash
 hook install check-jira commit-msg
-
-# Commit message must include JIRA ticket (e.g., PROJ-123)
+# Commit message: "Fixed bug" 
+# ❌ Commit message must include JIRA ticket (e.g., PROJ-123)
+# Commit message: "PROJ-123: Fixed bug"
+# ✅ Commit message contains JIRA ticket
 ```
 
-### Create Custom Template
+### Enforce Branch Naming
 
 ```bash
-# Create a file called myhook.sh
-hook create myhook < myhook.sh
-
-# Or pipe content directly
-echo '#!/bin/bash
-echo "Running my hook"
-exit 0' | hook create myhook
+hook install check-branch
+# On branch: main
+# ❌ Branch must start with: feat/, fix/, chore/, docs/, refactor/
+# On branch: feat/add-login
+# ✅ Branch name is valid
 ```
 
-Then install:
-```bash
-hook install myhook pre-commit
+## Requirements
 
-### Run Tests Before Commit
-
-```bash
-hook install run-tests pre-commit
-
-# Runs npm test before allowing commit
-```
-
-## Examples
-
-| Use Case | Command |
-|---------|---------|
-| Block secrets | `hook install no-api-keys pre-commit` |
-| Block .env | `hook install no-env pre-commit` |
-| Enforce branch | `hook install check-branch pre-push` |
-| Require JIRA | `hook install check-jira commit-msg` |
-| Run tests | `hook install run-tests pre-commit` |
-| Run lint | `hook install lint pre-commit` |
-| Create custom | `hook create myhook < file.sh` |
-| Use custom | `hook install myhook pre-commit` |
-
-## Templates
-
-| Template | Description |
-|---------|-------------|
-| `no-api-keys` | Block API keys, tokens, secrets |
-| `no-env` | Block .env files |
-| `check-branch` | Enforce branch naming |
-| `check-jira` | Require JIRA ticket in commit |
-| `run-tests` | Run tests before commit |
-| `lint` | Run linter |
-| `prettier` | Format code |
+- Node.js 14+
+- Git
+- Bash (Linux/macOS) or Git Bash (Windows)
 
 ## License
 
-MIT
+MIT - Fullspark Labs
