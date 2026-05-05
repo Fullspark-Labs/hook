@@ -1,0 +1,5 @@
+{
+  "description": "Block node_modules from commits",
+  "hookType": "pre-commit",
+  "code": "#!/bin/bash\necho \"Checking...\"\nfiles=$(git diff --cached --name-only --diff-filter=ACM)\nfor f in $files; do case \"$f\" in node_modules*) echo \"node_modules blocked\" && exit 1; esac; done\nexit 0"
+}

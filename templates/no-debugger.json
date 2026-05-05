@@ -1,0 +1,5 @@
+{
+  "description": "Block debugger/console.log statements",
+  "hookType": "pre-commit",
+  "code": "#!/bin/bash\necho \"Checking for debug...\"\nfiles=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\\.(js|ts|jsx|tsx)$')\nfor f in $files; do grep -q \"debugger\\|console\\.log\" \"$f\" 2>/dev/null && echo \"Debug: $f\" && exit 1; done\nexit 0"
+}

@@ -1,0 +1,5 @@
+{
+  "description": "Block merge commits",
+  "hookType": "commit-msg",
+  "code": "#!/bin/bash\nFILE=$1\n[ -z \"$FILE\" ] && exit 0\nMSG=$(cat \"$FILE\")\necho \"Checking...\"\necho \"$MSG\" | grep -qi \"^Merge\" && echo \"Avoid merge commits\" && exit 1\nexit 0"
+}

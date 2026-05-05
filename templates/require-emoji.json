@@ -1,0 +1,5 @@
+{
+  "description": "Require emoji in commit messages",
+  "hookType": "commit-msg",
+  "code": "#!/bin/bash\nEMOJI=\"(✨|🚧|✅|🐛|📝|🎨|🔥|💄|🔧|📦)\"\nFILE=$1\n[ -z \"$FILE\" ] && exit 0\nMSG=$(cat \"$FILE\")\necho \"Checking for emoji...\"\necho \"$MSG\" | grep -Eq \"$EMOJI\" && exit 0\necho \"Include emoji: ✨🚧✅🐛📝🎨\"\nexit 1"
+}

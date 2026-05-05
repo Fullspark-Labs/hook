@@ -1,0 +1,5 @@
+{
+  "description": "Block .env files from being committed",
+  "hookType": "pre-commit",
+  "code": "#!/bin/bash\n# Block .env and environment files\n\necho \"🔍 Checking for .env files...\"\n\nfiles=$(git diff --cached --name-only --diff-filter=ACM)\nFOUND=\n\nfor file in $files; do\n  case \"$file\" in\n    *.env|.env|.env.*|.env.local|.env.development|.env.production)\n      echo \"❌ Blocked: $file is an environment file\"\n      FOUND=1\n      ;;\n  esac\ndone\n\nif [ -n \"$FOUND\" ]; then\n  echo \"\"\n  echo \"💡 Add to .gitignore: echo '.env' >> .gitignore\"\n  exit 1\nfi\n\necho \"✅ No .env files detected\"\nexit 0"
+}

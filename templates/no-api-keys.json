@@ -1,0 +1,5 @@
+{
+  "description": "Block API keys, tokens, and secrets from commits",
+  "hookType": "pre-commit",
+  "code": "#!/bin/bash\n# Block API keys, tokens, secrets from being committed\n\nBLOCKED_PATTERNS=\"(api[_-]?key|apikey|token|secret|password|private[_-]?key|aws[_-]?access|aws[_-]?secret|PRIVATE[_-]?KEY|API[_-]?KEY|TOKEN|PASSWORD|SECRET)\"\n\necho \"🔍 Checking for secrets...\"\n\nfiles=$(git diff --cached --name-only --diff-filter=ACM)\nFOUND=\n\nfor file in $files; do\n  [ -f \"$file\" ] || continue\n  \n  if grep -Eiqo \"$BLOCKED_PATTERNS\" \"$file\" 2>/dev/null | head -1 > /dev/null; then\n    echo \"❌ Blocked: $file contains potential secret\"\n    FOUND=1\n  fi\ndone\n\nif [ -n \"$FOUND\" ]; then\n  echo \"\"\n  echo \"💡 Move secrets to .env or use environment variables\"\n  exit 1\nfi\n\necho \"✅ No secrets detected\"\nexit 0"
+}

@@ -1,0 +1,5 @@
+{
+  "description": "Block files larger than 100KB",
+  "hookType": "pre-commit",
+  "code": "#!/bin/bash\nMAX=100000\necho \"Checking file sizes...\"\nfiles=$(git diff --cached --name-only --diff-filter=ACM)\nfor f in $files; do [ -f \"$f\" ] && SIZE=$(stat -c%s \"$f\" 2>/dev/null) && [ \"$SIZE\" -gt \"$MAX\" ] && echo \"Too large: $f\" && exit 1; done\nexit 0"
+}

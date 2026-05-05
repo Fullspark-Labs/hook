@@ -1,0 +1,5 @@
+{
+  "description": "Require JIRA ticket format (PROJ-123)",
+  "hookType": "commit-msg",
+  "code": "#!/bin/bash\n# Require JIRA ticket format\n\nCOMMIT_MSG_FILE=$1\n[ -z \"$COMMIT_MSG_FILE\" ] && exit 0\n\nCOMMIT_MSG=$(cat \"$COMMIT_MSG_FILE\")\nBRANCH=$(git symbolic-ref --short HEAD 2>/dev/null | sed 's/.*\\///')\n\necho \"🔍 Checking JIRA format...\"\n\n# Check branch\nif [ -n \"$BRANCH\" ] && echo \"$BRANCH\" | grep -Eq \"^[A-Z]+-[0-9]+\"; then\n  echo \"✅ Branch contains JIRA ticket\"\n  exit 0\nfi\n\n# Check commit\nif echo \"$COMMIT_MSG\" | grep -Eq \"^[A-Z]+-[0-9]+:\"; then\n  echo \"✅ Commit message contains JIRA ticket\"\n  exit 0\nfi\n\necho \"❌ Commit must include JIRA ticket (e.g., PROJ-123: Fix bug)\"\necho \"   Or use branch: git checkout -b PROJ-123-feature\"\nexit 1"
+}

@@ -1,0 +1,5 @@
+{
+  "description": "Enforce branch naming (feat/, fix/, chore/, etc.)",
+  "hookType": "pre-commit",
+  "code": "#!/bin/bash\nALLOWED=\"^(feat|fix|chore|docs|refactor|test|ci|build)/\"\nBRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)\n[ -z \"$BRANCH\" ] && exit 0\necho \"Checking branch: $BRANCH\"\nif echo \"$BRANCH\" | grep -Eq \"$ALLOWED\"; then exit 0; fi\necho \"Branch must start with: feat/, fix/, chore/, docs/, refactor/\"\nexit 1"
+}
