@@ -74,6 +74,22 @@ hook install check-jira commit-msg
 # Commit message must include JIRA ticket (e.g., PROJ-123)
 ```
 
+### Create Custom Template
+
+```bash
+# Create a file called myhook.sh
+hook create myhook < myhook.sh
+
+# Or pipe content directly
+echo '#!/bin/bash
+echo "Running my hook"
+exit 0' | hook create myhook
+```
+
+Then install:
+```bash
+hook install myhook pre-commit
+
 ### Run Tests Before Commit
 
 ```bash
@@ -92,6 +108,8 @@ hook install run-tests pre-commit
 | Require JIRA | `hook install check-jira commit-msg` |
 | Run tests | `hook install run-tests pre-commit` |
 | Run lint | `hook install lint pre-commit` |
+| Create custom | `hook create myhook < file.sh` |
+| Use custom | `hook install myhook pre-commit` |
 
 ## Templates
 

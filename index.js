@@ -87,9 +87,19 @@ function installTemplate(templateName, hookName) {
   const hookDir = getHooksDir();
   const hookPath = path.join(hookDir, hookName);
   
-  const content = DEFAULT_TEMPLATES[templateName];
+  // Check default templates first, then custom
+  let content = DEFAULT_TEMPLATES[templateName];
+  if (!content) {
+    // Try custom template
+    const customPath = path.join(TEMPLATES_DIR, templateName);
+    if (fs.existsSync(customPath)) {
+      content = fs.readFileSync(customPath, 'utf8');
+    }
+  }
+  
   if (!content) {
     console.log(`❌ Template not found: ${templateName}`);
+    console.log(`   Run: hook list (to see available templates)`);
     return;
   }
   
@@ -159,15 +169,28 @@ const commands = {
   },
   create: () => {
     if (args.length < 1) {
-      console.log('Usage: hook create <name>');
+      console.log('Usage: hook create <name> [template-file]');
+      console.log('  Create custom hook template');
+      console.log('  Example: hook create myhook < template.sh');
       return;
     }
     const name = args[0];
-    const content = `#!/bin/bash
+    
+    let content = '';
+    if (process.stdin.isTTY) {
+      content = `#!/bin/bash
 # Custom hook: ${name}
 echo "Hello from ${name}"
 exit 0`;
-    createTemplate(name, content);
+    } else {
+      // Read from stdin
+      content = fs.readFileSync(0, 'utf8');
+    }
+    
+    const outPath = path.join(TEMPLATES_DIR, name);
+    fs.writeFileSync(outPath, content, { mode: 0o755 });
+    console.log(`✅ Created template: ${name}`);
+    console.log(`   Install with: hook install ${name} pre-commit`);
   },
   share: () => {
     if (args.length < 1) {
